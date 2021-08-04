@@ -46,6 +46,15 @@ def getTableData():
         link = colunaDownload.find_elements_by_tag_name('i')[0].get_attribute('onclick')
         documentsDict['linkDownload'].append(link[14:96])
 
+#Adiciona empresa a pesquisa pelo código
+def addCompanyToSearch(codigo):
+    codEmpresa = driver.find_element_by_id(codEmpresaId)
+    codEmpresa.send_keys(codigo)
+    aguardaDropdown = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, 'ui-menu-item')))
+    opcao = driver.find_element_by_class_name('ui-menu-item')
+    opcao.click()
+
+'''
 #Escolhe opção de período
 radioData = driver.find_element_by_id(radioPeriodoId)
 radioData.click()
@@ -75,7 +84,7 @@ wait = WebDriverWait(driver, 30).until(EC.invisibility_of_element_located((By.ID
 
 getTableData()
 print(documentsDict)
-
+'''
 
 
 
