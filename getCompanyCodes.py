@@ -13,6 +13,6 @@ for codigo in codigos:
     if len(codigo) < 5:
         codigos.remove(codigo)
 
-df2 = pd.DataFrame(codigos)  
+df2 = pd.DataFrame(codigos, columns = ['codigos']) 
 df2.to_excel("codigos.xlsx")  
 
