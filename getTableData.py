@@ -9,6 +9,7 @@ from datetime import datetime
 import time
 import pandas as pd
 
+codigos = []
 options = Options()
 options.headless = True
 PATH = 'chromedriver.exe'
@@ -34,6 +35,13 @@ documentsDict = {'codigo':[],
 driver.get('https://www.rad.cvm.gov.br/ENET/frmConsultaExternaCVM.aspx')
 time.sleep(5)
 
+
+#Pega codigos das empresas
+def getCompanyCodes():
+    codigosDF = pd.read_excel('codigos.xlsx', converters={'codigos':str})
+    for index, row in codigosDF.iterrows():
+        codigos.append(str(row['codigos']))
+
 #Pega dados da tabela gerada e salva no dict
 def getTableData():
     linhas = driver.find_elements_by_xpath('//*[@id="grdDocumentos"]/tbody/tr')
@@ -50,9 +58,15 @@ def getTableData():
 def addCompanyToSearch(codigo):
     codEmpresa = driver.find_element_by_id(codEmpresaId)
     codEmpresa.send_keys(codigo)
-    aguardaDropdown = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, 'ui-menu-item')))
+    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, 'ui-menu-item')))
+    WebDriverWait(driver, 10).until(EC.invisibility_of_element((By.ID, 'divSplash')))
     opcao = driver.find_element_by_class_name('ui-menu-item')
     opcao.click()
+
+
+getCompanyCodes()
+for codigo in codigos:
+    addCompanyToSearch(codigo)
 
 '''
 #Escolhe opção de período
@@ -76,15 +90,14 @@ inputCategoria = driver.find_element_by_xpath('//*[@id="cboCategorias_chosen"]/d
 inputCategoria.click()
 
 #Faz submit no form para gerar tabela
-driver.find_element_by_id(botaoSubmit).click()
+#driver.find_element_by_id(botaoSubmit).click()
 
 #Aguarda página terminar de carregar
-wait = WebDriverWait(driver, 30).until(EC.invisibility_of_element_located((By.ID, botaoSubmit)))
+#wait = WebDriverWait(driver, 30).until(EC.invisibility_of_element_located((By.ID, botaoSubmit)))
 
 
-getTableData()
-print(documentsDict)
+#getTableData()
+#print(documentsDict)
 '''
-
 
 
