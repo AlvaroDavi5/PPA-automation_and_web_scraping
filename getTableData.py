@@ -1,20 +1,25 @@
-from selenium import webdriver
+import time # timeset library
+from datetime import datetime # datetime consult library
+import pandas as pd # to databases and data manipulation functions
+from selenium import webdriver # do autotests on browser
+# simulate clicks and typing
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.select import Select
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from datetime import datetime
-import time
-import pandas as pd
+from selenium.webdriver.support.select import Select # verify if tag is a 'select'
+from selenium.webdriver.support.ui import WebDriverWait # makes webdrive wait page load
+from selenium.webdriver.support import expected_conditions as EC # verify if expected conditions is valid
+from selenium.webdriver.chrome.options import Options # chrome webdriver options
+from webdriver_manager.chrome import ChromeDriverManager # chrome webdriver manager
+
 
 options = Options()
 options.headless = True
-PATH = 'chromedriver.exe'
+PATH = 'webdriver/chromedriver.exe'
+url = 'https://www.rad.cvm.gov.br/ENET/frmConsultaExternaCVM.aspx'
 
-driver = webdriver.Chrome(PATH, options = options)
-#driver = webdriver.Chrome(PATH)
+driver = webdriver.Chrome(ChromeDriverManager().install()) # call the webdriver - installed on cache - to open the browser and get the URL
+#driver = webdriver.Chrome()
+#driver = webdriver.Chrome(PATH, options=options) # call the webdriver - using bin/exe file - to open the browser and get the URL
 
 codEmpresaId = 'cboEmpresa'
 dataInicioId = 'txtDataIni'
@@ -34,7 +39,7 @@ codigos = []
 erros = {'empresa':[],
          'codigo':[]}
 
-driver.get('https://www.rad.cvm.gov.br/ENET/frmConsultaExternaCVM.aspx')
+driver.get(url)
 time.sleep(5)
 
 #Pega codigos das empresas
