@@ -90,8 +90,7 @@ def addCompaniesToSearch():
 
 #Escolhe opção de período
 def radioPeriod():
-    radioData = driver.find_element_by_id(radioPeriodoId)
-    radioData.click()
+    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.ID, radioPeriodoId))).click()
 
 #Coloca data inicial
 def iniDate():
@@ -107,21 +106,18 @@ def endDate():
 
 #Coloca categoria
 def chooseCategory():
-    categorias = driver.find_element_by_xpath('//*[@id="cboCategorias_chosen"]')
-    categorias.click()
-    inputCategoria = driver.find_element_by_xpath('//*[@id="cboCategorias_chosen"]/div/ul/li[22]')
-    inputCategoria.click()
+    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.ID, 'cboCategorias_chosen'))).click()
+    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="cboCategorias_chosen"]/div/ul/li[22]'))).click()
 
 #Faz submit no form para gerar tabela
 def submitForm():
-    driver.find_element_by_id(botaoSubmit).click()
+    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.ID, botaoSubmit))).click()
     WebDriverWait(driver, 30).until(EC.invisibility_of_element_located((By.ID, botaoSubmit)))
 
 addCompaniesToSearch()
 radioPeriod()
 iniDate()
 endDate()
-time.sleep(3)
 chooseCategory()
 submitForm()
 getTableData()
