@@ -63,7 +63,7 @@ def getTablePageData():
 #Pega dados da tabela gerada e salva no dict
 def getTableData():
     nextBtn = driver.find_element_by_id('grdDocumentos_next')
-    while(nextBtn.is_enabled() and nextBtn.is_displayed()):
+    while(nextBtn.get_attribute('class') == 'paginate_button next'):
         getTablePageData()
         nextBtn.click()
         nextBtn = driver.find_element_by_id('grdDocumentos_next')
@@ -114,7 +114,7 @@ def submitForm():
     WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.ID, botaoSubmit))).click()
     WebDriverWait(driver, 30).until(EC.invisibility_of_element_located((By.ID, botaoSubmit)))
 
-addCompaniesToSearch()
+#addCompaniesToSearch()
 radioPeriod()
 iniDate()
 endDate()
