@@ -17,7 +17,7 @@ options.headless = True
 PATH = 'webdriver/chromedriver.exe'
 url = 'https://www.rad.cvm.gov.br/ENET/frmConsultaExternaCVM.aspx'
 
-driver = webdriver.Chrome(ChromeDriverManager().install()) # call the webdriver - and install driver manager - to open the browser and get the URL
+driver = webdriver.Chrome(ChromeDriverManager().install()) # call the webdriver - installed on cache - to open the browser and get the URL
 #driver = webdriver.Chrome()
 #driver = webdriver.Chrome(PATH, options=options) # call the webdriver - using bin/exe file - to open the browser and get the URL
 
