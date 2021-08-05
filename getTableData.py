@@ -11,7 +11,6 @@ from selenium.webdriver.support import expected_conditions as EC # verify if exp
 from selenium.webdriver.chrome.options import Options # chrome webdriver options
 from webdriver_manager.chrome import ChromeDriverManager # chrome webdriver manager
 
-
 options = Options()
 options.headless = True
 PATH = 'webdriver/chromedriver.exe'
@@ -33,7 +32,6 @@ dataAtual = datetime.today().strftime('%d/%m/%Y')
 documentsDict = {'codigo':[],
                  'nomeEmpresa':[],
                  'data':[],
-                 'status':[],
                  'linkDownload':[]}
 codigos = []
 erros = {'empresa':[],
@@ -52,13 +50,14 @@ def getCompanyCodes():
 def getTablePageData():
     linhas = driver.find_elements_by_xpath('//*[@id="grdDocumentos"]/tbody/tr')
     for linha in linhas:
-        documentsDict['codigo'].append(linha.find_elements_by_tag_name('td')[0].get_attribute('innerText'))
-        documentsDict['nomeEmpresa'].append(linha.find_elements_by_tag_name('td')[1].get_attribute('innerText'))
-        documentsDict['data'].append(linha.find_elements_by_tag_name('td')[6].get_attribute('innerText'))
-        documentsDict['status'].append(linha.find_elements_by_tag_name('td')[7].get_attribute('innerText'))
-        colunaDownload = linha.find_elements_by_tag_name('td')[10]
-        link = colunaDownload.find_elements_by_tag_name('i')[0].get_attribute('onclick')
-        documentsDict['linkDownload'].append(link[14:96])
+        status = linha.find_elements_by_tag_name('td')[7].get_attribute('innerText')
+        if status == 'Ativo':
+            documentsDict['codigo'].append(linha.find_elements_by_tag_name('td')[0].get_attribute('innerText'))
+            documentsDict['nomeEmpresa'].append(linha.find_elements_by_tag_name('td')[1].get_attribute('innerText'))
+            documentsDict['data'].append(linha.find_elements_by_tag_name('td')[6].get_attribute('innerText'))
+            colunaDownload = linha.find_elements_by_tag_name('td')[10]
+            link = colunaDownload.find_elements_by_tag_name('i')[0].get_attribute('onclick')
+            documentsDict['linkDownload'].append(link[14:96])
 
 #Pega dados da tabela gerada e salva no dict
 def getTableData():
@@ -67,6 +66,9 @@ def getTableData():
         getTablePageData()
         nextBtn.click()
         nextBtn = driver.find_element_by_id('grdDocumentos_next')
+        if nextBtn.get_attribute('class') != 'paginate_button next':
+            getTablePageData()
+            break  
 
 #Adiciona uma empresa à pesquisa pelo código
 def addCompanyToSearch(row):
@@ -75,11 +77,6 @@ def addCompanyToSearch(row):
     WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.CLASS_NAME, 'ui-menu-item')))
     WebDriverWait(driver, 15).until(EC.invisibility_of_element((By.ID, 'divSplash')))
     opcao = driver.find_element_by_class_name('ui-menu-item')
-    opcoes = driver.find_elements_by_class_name('ui-menu-item')
-    if(len(opcoes)>1):
-        print(row['codigo'])
-        erros['codigo'].append(row['codigo'])
-        erros['empresa'].append(row['empresa'])
     opcao.click()
 
 #Adiciona todas empresas da base a pesquisa
@@ -114,11 +111,11 @@ def submitForm():
     WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.ID, botaoSubmit))).click()
     WebDriverWait(driver, 30).until(EC.invisibility_of_element_located((By.ID, botaoSubmit)))
 
-#addCompaniesToSearch()
 radioPeriod()
 iniDate()
 endDate()
 chooseCategory()
+addCompaniesToSearch()
 submitForm()
 getTableData()
 documentsDF = pd.DataFrame(documentsDict)
