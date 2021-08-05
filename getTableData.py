@@ -9,13 +9,12 @@ from datetime import datetime
 import time
 import pandas as pd
 
-codigos = []
 options = Options()
 options.headless = True
 PATH = 'chromedriver.exe'
 
-#driver = webdriver.Chrome(PATH, options = options)
-driver = webdriver.Chrome(PATH)
+driver = webdriver.Chrome(PATH, options = options)
+#driver = webdriver.Chrome(PATH)
 
 codEmpresaId = 'cboEmpresa'
 dataInicioId = 'txtDataIni'
@@ -31,16 +30,18 @@ documentsDict = {'codigo':[],
                  'data':[],
                  'status':[],
                  'linkDownload':[]}
+codigos = []
+erros = {'empresa':[],
+         'codigo':[]}
 
 driver.get('https://www.rad.cvm.gov.br/ENET/frmConsultaExternaCVM.aspx')
 time.sleep(5)
 
-
 #Pega codigos das empresas
 def getCompanyCodes():
-    codigosDF = pd.read_excel('codigos.xlsx', converters={'codigos':str})
+    codigosDF = pd.read_excel('codigos.xlsx', converters={'codigo':str})
     for index, row in codigosDF.iterrows():
-        codigos.append(str(row['codigos']))
+        codigos.append(row)
 
 #Pega dados da tabela gerada e salva no dict
 def getTableData():
@@ -54,48 +55,60 @@ def getTableData():
         link = colunaDownload.find_elements_by_tag_name('i')[0].get_attribute('onclick')
         documentsDict['linkDownload'].append(link[14:96])
 
-#Adiciona empresa a pesquisa pelo código
-def addCompanyToSearch(codigo):
+#Adiciona uma empresa à pesquisa pelo código
+def addCompanyToSearch(row):
     codEmpresa = driver.find_element_by_id(codEmpresaId)
-    codEmpresa.send_keys(codigo)
-    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, 'ui-menu-item')))
-    WebDriverWait(driver, 10).until(EC.invisibility_of_element((By.ID, 'divSplash')))
+    codEmpresa.send_keys(row['codigo'])
+    WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.CLASS_NAME, 'ui-menu-item')))
+    WebDriverWait(driver, 15).until(EC.invisibility_of_element((By.ID, 'divSplash')))
     opcao = driver.find_element_by_class_name('ui-menu-item')
+    opcoes = driver.find_elements_by_class_name('ui-menu-item')
+    if(len(opcoes)>1):
+        print(row['codigo'])
+        erros['codigo'].append(row['codigo'])
+        erros['empresa'].append(row['empresa'])
     opcao.click()
 
+#Adiciona todas empresas da base a pesquisa
+def addCompaniesToSearch():
+    getCompanyCodes()
+    for row in codigos:
+        addCompanyToSearch(row)
 
-getCompanyCodes()
-for codigo in codigos:
-    addCompanyToSearch(codigo)
-
-'''
 #Escolhe opção de período
-radioData = driver.find_element_by_id(radioPeriodoId)
-radioData.click()
+def radioPeriod():
+    radioData = driver.find_element_by_id(radioPeriodoId)
+    radioData.click()
 
 #Coloca data inicial
-inputDataIni = driver.find_element_by_id(dataInicioId)
-inputDataIni.send_keys('31/12/2016')
-inputDataIni.send_keys(Keys.ENTER)
+def iniDate():
+    inputDataIni = driver.find_element_by_id(dataInicioId)
+    inputDataIni.send_keys('31/12/2016')
+    inputDataIni.send_keys(Keys.ENTER)
 
 #Coloca data final
-inputDataFim = driver.find_element_by_id(dataFimId)
-inputDataFim.send_keys(dataAtual)
-inputDataFim.send_keys(Keys.ENTER)
+def endDate():
+    inputDataFim = driver.find_element_by_id(dataFimId)
+    inputDataFim.send_keys(dataAtual)
+    inputDataFim.send_keys(Keys.ENTER)
 
 #Coloca categoria
-categorias = driver.find_element_by_xpath('//*[@id="cboCategorias_chosen"]')
-categorias.click()
-inputCategoria = driver.find_element_by_xpath('//*[@id="cboCategorias_chosen"]/div/ul/li[22]')
-inputCategoria.click()
+def chooseCategory():
+    categorias = driver.find_element_by_xpath('//*[@id="cboCategorias_chosen"]')
+    categorias.click()
+    inputCategoria = driver.find_element_by_xpath('//*[@id="cboCategorias_chosen"]/div/ul/li[22]')
+    inputCategoria.click()
 
 #Faz submit no form para gerar tabela
-#driver.find_element_by_id(botaoSubmit).click()
+def submitForm():
+    driver.find_element_by_id(botaoSubmit).click()
+    WebDriverWait(driver, 30).until(EC.invisibility_of_element_located((By.ID, botaoSubmit)))
 
-#Aguarda página terminar de carregar
-#wait = WebDriverWait(driver, 30).until(EC.invisibility_of_element_located((By.ID, botaoSubmit)))
-
-
+addCompaniesToSearch()
+df2 = pd.DataFrame(erros) 
+df2.to_excel("erros.xlsx")  
+print('CABO')
+'''
 #getTableData()
 #print(documentsDict)
 '''
