@@ -48,8 +48,8 @@ def getCompanyCodes():
     for index, row in codigosDF.iterrows():
         codigos.append(row)
 
-#Pega dados da tabela gerada e salva no dict
-def getTableData():
+#Pega dados de uma página da tabela gerada e salva no dict
+def getTablePageData():
     linhas = driver.find_elements_by_xpath('//*[@id="grdDocumentos"]/tbody/tr')
     for linha in linhas:
         documentsDict['codigo'].append(linha.find_elements_by_tag_name('td')[0].get_attribute('innerText'))
@@ -59,6 +59,14 @@ def getTableData():
         colunaDownload = linha.find_elements_by_tag_name('td')[10]
         link = colunaDownload.find_elements_by_tag_name('i')[0].get_attribute('onclick')
         documentsDict['linkDownload'].append(link[14:96])
+
+#Pega dados da tabela gerada e salva no dict
+def getTableData():
+    nextBtn = driver.find_element_by_id('grdDocumentos_next')
+    while(nextBtn.is_enabled() and nextBtn.is_displayed()):
+        getTablePageData()
+        nextBtn.click()
+        nextBtn = driver.find_element_by_id('grdDocumentos_next')
 
 #Adiciona uma empresa à pesquisa pelo código
 def addCompanyToSearch(row):
@@ -110,12 +118,15 @@ def submitForm():
     WebDriverWait(driver, 30).until(EC.invisibility_of_element_located((By.ID, botaoSubmit)))
 
 addCompaniesToSearch()
-df2 = pd.DataFrame(erros) 
-df2.to_excel("erros.xlsx")  
-print('CABO')
-'''
-#getTableData()
-#print(documentsDict)
-'''
+radioPeriod()
+iniDate()
+endDate()
+time.sleep(3)
+chooseCategory()
+submitForm()
+getTableData()
+documentsDF = pd.DataFrame(documentsDict)
+documentsDF.to_excel("documentos.xlsx") 
+
 
 
