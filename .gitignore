@@ -1,6 +1,6 @@
 
 # ignore
-
+*.pdf
 *.xlsx
 /PPAs
 
