@@ -1,0 +1,10 @@
+
+# ignore
+
+*.xlsx
+/PPAs
+
+
+# except
+!/data
+

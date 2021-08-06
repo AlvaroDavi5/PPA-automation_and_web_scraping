@@ -1,15 +1,14 @@
-import time # timeset library
-from datetime import datetime # datetime consult library
-import pandas as pd # to databases and data manipulation functions
-from selenium import webdriver # do autotests on browser
-# simulate clicks and typing
+import time
+from datetime import datetime
+import pandas as pd
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.select import Select # verify if tag is a 'select'
-from selenium.webdriver.support.ui import WebDriverWait # makes webdrive wait page load
-from selenium.webdriver.support import expected_conditions as EC # verify if expected conditions is valid
-from selenium.webdriver.chrome.options import Options # chrome webdriver options
-from webdriver_manager.chrome import ChromeDriverManager # chrome webdriver manager
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 
 options = Options()
 options.headless = True
@@ -42,7 +41,7 @@ time.sleep(5)
 
 #Pega codigos das empresas
 def getCompanyCodes():
-    codigosDF = pd.read_excel('codigos.xlsx', converters={'codigo':str})
+    codigosDF = pd.read_excel('./data/codigos.xlsx', converters={'codigo':str})
     for index, row in codigosDF.iterrows():
         codigos.append(row)
 
@@ -119,7 +118,7 @@ addCompaniesToSearch()
 submitForm()
 getTableData()
 documentsDF = pd.DataFrame(documentsDict)
-documentsDF.to_excel("documentos.xlsx") 
+documentsDF.to_excel("./data/documentos.xlsx") 
 
 
 
